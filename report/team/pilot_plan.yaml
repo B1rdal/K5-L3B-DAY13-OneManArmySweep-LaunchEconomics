@@ -1,51 +1,55 @@
-# Lab 13 · Nhiệm vụ D · Kế hoạch pilot trợ lý hoàn phí LogiX-VN (Gate 2a)
-# Điền mọi chỗ có dấu hỏi. Khi nộp, ngoài các dòng chú thích không còn dấu hỏi nào.
-# Kiểm tra đọc được: python -c "import yaml; yaml.safe_load(open('../report/team/pilot_plan.yaml'))"
-#
-# D1 · Cỡ mẫu (baseline 0,70; mục tiêu +5 điểm; alpha 0,05; power 0,8; ICC 0,02)
-#   a) Chia theo yêu cầu:
-#   b) Theo nhân viên, m = 75:
-#   c) 20 nhân viên mỗi nhóm:
-#   d) 6 depot mỗi nhóm:
-#   e) Mức chênh 6 điểm (859 mỗi nhóm), 20 nhân viên mỗi nhóm:
-#
-# D2 · Năm câu kiểm tra "tách được tác động" với cách chia đã chọn (mỗi câu một dòng):
-#   1. Đối chứng chạy cùng thời gian:
-#   2. Chia ngẫu nhiên hay do người chọn:
-#   3. Ảnh hưởng gián tiếp và cách giảm:
-#   4. Chỉ số chính, ngưỡng, ngày quyết định đã viết trước:
-#   5. Ít nhất 20 cụm mỗi nhóm:
-#
-# Đánh đổi đã chấp nhận (nếu cách chia chưa đạt cả hai điều kiện):
-#
-# Tỉ lệ mo_lai_trong_7_ngay hiện tại và ngưỡng an toàn đã chọn:
+# Nhiệm vụ D · Pilot LogiX-VN · Gate 2a
+# D1a. Ngẫu nhiên theo yêu cầu, baseline 0,70 đến 0,75: 1.251 yêu cầu mỗi nhánh.
+# D1b. m=75, ICC=0,02: DE=2,48; 3.103 yêu cầu và 42 nhân viên mỗi nhánh. Hiện có 40 nhân viên tổng cộng.
+# D1c. 20 nhân viên mỗi nhánh: n hiệu dụng tiệm cận 1.000, thấp hơn 1.251.
+# D1d. 6 depot mỗi nhánh: n hiệu dụng tiệm cận 300, thấp hơn 1.251 và thiếu cụm.
+# D1e. +6 điểm cần 859 hiệu dụng/nhánh. Giải 20m / [1 + (m-1)×0,02] ≥ 859 được m≥299.
+#      20×299 = 5.980 yêu cầu thực/nhánh, DE=6,96. Với +5 điểm, power chỉ 64,2% ở 859 hiệu dụng.
+# D2. 1) Đối chứng đồng thời trong cùng các depot. 2) Chia bằng mã với seed cố định, cân bằng theo depot.
+#     3) Hạn chế chia sẻ gợi ý, phân quyền theo tài khoản và kiểm log tiếp xúc sai nhánh.
+#     4) Chốt chỉ số, ngưỡng, phân tích, lịch và tiêu chí thiếu mẫu trước randomization.
+#     5) Cần đủ 20 nhân viên ở mỗi nhánh. Nếu thiếu thì báo chưa đủ bằng chứng.
+# An toàn trước pilot: mở lại 51/1.200=4,25% toàn mẫu và 39/982=3,97% trong phạm vi.
+# Các ngày, ngưỡng vận hành và lựa chọn thiết kế sau đây là đề xuất cho Gate 2a.
 
 pilot:
-  owner: "?"                      # một người có tên vai trò, không ghi "cả đội"
-  scope: "?"                      # loại yêu cầu nào, depot nào; dựa vào kết quả A3
+  owner: "Giám đốc vận hành LogiX-VN"
+  scope: "noi_dia và hang_nang tại 12 depot, sau khi xác nhận đủ 40 nhân viên và đủ lượng ca; quoc_te và doi_tac đi luồng nhân viên."
   assignment:
-    unit: "?"                     # request | staff | depot
+    unit: staff
     control_share: 0.5
     randomized: true
-  rollout: [0.10, 0.25, 0.50]     # mỗi bước một tuần
+    seed: 1302
+    balancing: "Cân bằng theo depot và bảo đảm tổng 20 nhân viên mỗi nhánh. Giữ nguyên nhánh theo nhân viên trong pilot."
+  start_date: "2026-12-07"
+  rollout: [0.10, 0.25, 0.50]
+  rollout_window: "Mỗi nấc ít nhất 1 tuần. Chỉ mở thêm trong nhánh can thiệp đã bốc thăm. Khi đủ 50%, bắt đầu thu cohort chính."
   primary_metric:
     name: dong_trong_24h_khong_mo_lai_7_ngay
     baseline: 0.70
-    mde: 0.05
+    mde: 0.06
     alpha: 0.05
     power: 0.80
-    n_per_arm: "?"
-    design_effect: "?"            # 1 nếu chia theo yêu cầu
-    clusters_per_arm: "?"         # để trống nếu chia theo yêu cầu
+    n_per_arm: 859
+    design_effect: 6.96
+    clusters_per_arm: 20
+    raw_minimum_per_arm: 5980
+    target_per_staff: 299
+    analysis: "Theo nhánh phân công, bao gồm ca được chuyển nhân viên. So chênh lệch tuyệt đối và CI 95% với sai số theo cụm nhân viên, có điều chỉnh depot."
   identifiability:
-    concurrent_control: "?"
-    spillover_risk: "?"
-    predeclared: "?"
+    concurrent_control: "Nhân viên đối chứng dùng quy trình hiện tại trong cùng khoảng thời gian, cùng depot và cùng tiêu chí đủ điều kiện."
+    spillover_risk: "Nhân viên có thể chia sẻ gợi ý trong depot. Giới hạn truy cập theo tài khoản, ghi staff_id và arm khi hiển thị, rà tiếp xúc sai nhánh mỗi tuần."
+    predeclared: "Chốt phân tầng, seed, chỉ số, phân tích và luật dừng trước khi chạy. Chỉ xét mở rộng khi đủ cụm và mẫu đã trưởng thành, cải thiện ước lượng ít nhất 5 điểm phần trăm, CI 95% có cận dưới lớn hơn 0 và đạt điều kiện an toàn, chi phí, sử dụng."
   stop_rules:
-    - "NẾU ? TRONG ? THÌ ? KHÔNG THÌ ?"
-    - "NẾU ? TRONG ? THÌ ? KHÔNG THÌ ?"
-    - "NẾU ? TRONG ? THÌ ? KHÔNG THÌ ?"
-  interim_looks: "chỉ kiểm tra chỉ số an toàn"
-  rollback: "?"                   # ai bấm, mất bao lâu, khách được phục vụ bằng gì
-  decision_date: "?"
-  simulated_inputs: ["?"]         # liệt kê mọi con số giả lập đã dùng
+    - "NẾU có ít nhất 1 khoản hoàn trùng TRONG thời gian pilot THÌ Giám đốc vận hành tắt trợ lý trong 30 phút và đối soát sổ cái KHÔNG THÌ tiếp tục giám sát hoàn trùng ở nấc hiện tại."
+    - "NẾU tỉ lệ mở lại 7 ngày ở nhánh trợ lý vượt 6% hoặc cao hơn đối chứng từ 2 điểm phần trăm TRONG 3 lần đối soát hằng ngày liên tiếp trên các cohort đã đủ 7 ngày theo dõi THÌ Giám đốc vận hành tạm dừng và chuyển luồng về nhân viên trong 30 phút KHÔNG THÌ giữ nấc hiện tại cho tới kỳ xét tăng nấc."
+    - "NẾU chi phí cả hệ thống trên mỗi yêu cầu đủ điều kiện vượt 12.000 đ TRONG 2 tuần báo cáo liên tiếp THÌ PM trợ lý hoàn phí khóa tăng nấc và đề xuất điều chỉnh phạm vi cho Giám đốc vận hành KHÔNG THÌ duy trì giới hạn 2 lượt chạy và xét nấc tiếp theo theo lịch."
+    - "NẾU trên 40% lượt xem lại có quyết định sửa hoặc bỏ, với ít nhất 30 lượt xem lại TRONG 1 tuần THÌ Trưởng nhóm CSKH giữ nấc hiện tại và rà 5 ca với nhân viên trong 3 ngày KHÔNG THÌ tiếp tục thu dữ liệu ở nấc hiện tại tới kỳ xét."
+  interim_looks: "Theo dõi an toàn, chi phí và mức dùng để vận hành. Không kiểm định hiệu quả chỉ số chính giữa kỳ."
+  rollback: "Giám đốc vận hành tắt cờ trợ lý trong 30 phút. Chuyển yêu cầu mới và đang chờ sang luồng nhân viên; đối soát sổ cái trước khi thử lại các lệnh hoàn đang chờ."
+  decision_date: "2027-01-05"
+  decision_readiness: "Dùng cohort đã đủ 7 ngày theo dõi sau khi đóng. Nếu tới ngày quyết định mà thiếu mẫu, lùi phiên quyết định hoặc kết luận chưa đủ bằng chứng; không mở rộng."
+  simulated_inputs:
+    - "phut_xem_lai_simulated và phut_lam_lai_simulated: dùng để lập dự báo A–B; pilot thay bằng phút đo thật."
+    - "CPS theo loại, độ nhạy rework/review và chi phí cả hệ thống là simulated khi dùng các cột phút giả lập."
+    - "B4 dùng giả định 5 phút xem lại, 9 phút làm lại và kịch bản 15,3 phút làm lại (simulated)."
