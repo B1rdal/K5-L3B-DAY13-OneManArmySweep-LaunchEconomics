@@ -18,7 +18,7 @@
 
 ## 4. Kết quả
 
-CPS trước cố định là 4.471,97 đ và chi phí hệ thống trước cố định là 5.864,65 đ/yêu cầu (simulated). Trong ba giới hạn lượt chạy, 2 lượt cho tổng hệ thống thấp nhất (6.901.220,23 đ simulated trên mẫu). Đề xuất Go có điều kiện cho `noi_dia` và `hang_nang`. Nhóm Economics đánh giá bài nộp này tại Gate 2a. [Phiếu chấm](phieu_cham.md) chưa có kết quả.
+CPS trước cố định là 4.471,97 đ và chi phí hệ thống trước cố định là 5.864,65 đ/yêu cầu (simulated). Hai lượt chạy cho tổng chi phí hệ thống thấp nhất trên mẫu. [Phiếu chấm Gate 2a](phieu_cham.md) ghi ba điểm tham khảo 27/30, 25/30 và 22/30 và đề xuất Go có điều kiện cho `noi_dia` và `hang_nang`.
 
 ## 5. Khó khăn và cách xử lý
 
